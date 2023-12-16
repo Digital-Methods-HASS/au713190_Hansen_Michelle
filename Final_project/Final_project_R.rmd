@@ -1,0 +1,175 @@
+---
+title: "Projekt_on_pc"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(rvest)
+library(stringr)
+library(janitor)
+library(ggplot2)
+library(hrbrthemes)
+library(tidyr)
+library(viridis)
+```
+#full data set.
+
+```{r}
+library(readr)
+children_born_per_woman_world_bank <- read_csv("C:/Users/miche/OneDrive/Skrivebord/A. Universitet/3. semester/Spor 1 - teoriorienteret metode/children-born-per-woman-world-bank.csv", 
+    col_types = cols(Year = col_number(), 
+        `Fertility rate, total (births per woman)` = col_number()))
+View(children_born_per_woman_world_bank)
+```
+
+#The importet data is a section of the full data set. This is both to make it clearer to compare and analyse one country with another rather than to look at the world as a whole, to account for differences socialy, culturaly and historically.   
+#Import data, kør hver gang. 
+```{r}
+library(readr)
+df <- read_csv("C:/Users/miche/OneDrive/Skrivebord/A. Universitet/3. semester/Spor 1 - teoriorienteret metode/Fertility_rate_australia_.csv", 
+    col_types = cols(Year = col_number(), 
+        `Fertility rate` = col_number()))
+df
+```
+#changing the name of Fertility rate to something without space 
+```{r}
+names(df)[3] <- ("Fertility_rate")
+```
+
+
+#Making a graf 
+```{r}
+df%>% 
+  filter(Year %in% c("1960", "1970", "1980", "1990", "2000", "2010", "2019")) %>% 
+  filter(Country %in% c("Australia")) %>%
+  group_by(Country,
+           Year,
+            Fertility_rate) %>% 
+  tally() %>% 
+  ggplot(aes(x = Country,
+             y = Year,
+             fill = Fertility_rate)) + 
+  geom_line(position="dodge", stat="identity", width=3.5) 
+```
+```{r}
+df %>% 
+  ggplot(aes(x= Year, y= Fertility_rate)) +
+  geom_line(color = "black") +
+  geom_point(color = "blue") +
+  ggtitle("Fertility rate in Australia per woman")
+```
+```{r}
+df %>% 
+  ggplot(aes(x= Year, y= Fertility_rate)) +
+  geom_line(color = "black") +
+  geom_point(color = "blue") +
+  ggtitle("Fertility rate in Australia per woman")
+```
+
+
+```{r}
+df%>% 
+  filter(Fertility_rate %in% c("Fertility rate in Australia per woman")) %>% 
+  filter(Year %in% c("1960", "1970", "1980", "1990", "2000", "2010", "2019")) %>% 
+  tail(7) %>%
+  ggplot(aes(x=Year, y=Fertility_rate)) +
+    geom_line( color="#69b3a2") +
+    geom_point(shape=21, color="black", fill="#69b3a2", size=3) +
+    theme_ipsum()m+
+  ggtitle("Fertility rate in Australia per woman")
+```
+
+#looking at another country 
+
+```{r}
+library(readr)
+fertility_rate_complete_gapminder <- read_csv("C:/Users/miche/OneDrive/Skrivebord/A. Universitet/3. semester/Spor 1 - teoriorienteret metode/fertility-rate-complete-gapminder.csv", 
+    col_types = cols(Year = col_number(), 
+        `Fertility rate (Complete Gapminder, v12) (2017)` = col_number()))
+View(fertility_rate_complete_gapminder)
+```
+#Below i have manually seperated two countries, Germany and Niger in excel.
+
+```{r}
+library(readr)
+Niger_Germany_Fertility <- read_csv("C:/Users/miche/OneDrive/Skrivebord/A. Universitet/3. semester/Spor 1 - teoriorienteret metode/Niger_Germany_Fertility.csv", 
+    col_types = cols(Year = col_number(), 
+        Fertility_rate = col_number()))
+View(Niger_Germany_Fertility)
+```
+
+```{r}
+Niger_Germany_Fertility %>% 
+  ggplot(aes(x= Year, y= Fertility_rate)) +
+  geom_jitter(color = "black") +
+  geom_line(color = "blue") +
+  ggtitle("Fertility rate of Niger and Germeny")
+```
+# looks cool, however it's not very presentable and messy looking. i'm gonna atempt to seperate Niger and Germany into two different coloums
+
+```{r}
+filter(Niger_Germany_Fertility, Country == "Germany")
+```
+
+```{r}
+Ger <- Niger_Germany_Fertility %>% 
+  select(Country, Year, Fertility_rate) %>% 
+  filter(Country == "Germany")
+Ger
+```
+
+```{r}
+Ner <- Niger_Germany_Fertility %>% 
+  select(Country, Year, Fertility_rate) %>% 
+  filter(Country=="Niger")
+Ner
+```
+#Amazing, i'm now going to make the graph for each country
+
+```{r}
+Ger %>% 
+   ggplot(aes(x= Year, y= Fertility_rate)) +
+  geom_line(color = "black") +
+  geom_point(color = "blue") +
+  ggtitle("Fertility rate in Germany per woman")
+```
+
+```{r}
+Ner %>% 
+   ggplot(aes(x= Year, y= Fertility_rate)) +
+  geom_line(color = "blue") +
+  theme_bw() +
+  ggtitle("Fertility rate in Niger per woman")
+```
+# I realized that i could have used the same kind of filtering for the complete data set. 
+"hans rosling - doller street 
+will you behave the same if you have the same income. japan and usa baby boom 
+
+
